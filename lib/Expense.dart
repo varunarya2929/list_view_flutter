@@ -1,10 +1,12 @@
 class Expense {
-  late String expense;
-  late double amount;
+  final int id;
+  final String expense;
+  final double amount;
 
-  
-  Expense( String expense, double amount) {
-    this.expense = expense;
-    this.amount = amount;
+  const Expense(
+      {required this.id, required this.expense, required this.amount});
+
+  Map<String, dynamic> toMap() {
+    return {'expense': expense, 'amount': amount};
   }
 }

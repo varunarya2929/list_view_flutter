@@ -4,6 +4,8 @@ import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:list_view_flutter/Expense.dart';
 
+import 'database.dart';
+
 class EventScreenState extends StatefulWidget {
   const EventScreenState({Key? key}) : super(key: key);
 
@@ -13,6 +15,22 @@ class EventScreenState extends StatefulWidget {
 
 class _EventScreenStateState extends State<EventScreenState> {
   List<Expense> currentindex = [];
+  late DatabaseProvider databaseProvider;
+  @override
+  void initState() {
+    super.initState();
+    print("in initState");
+    databaseProvider = new DatabaseProvider();
+    databaseProvider.createDatabase();
+    WidgetsFlutterBinding.ensureInitialized();
+
+    getList();
+  }
+
+  getList() async {
+    currentindex = await databaseProvider.getExpense();
+    setState(() {});
+  }
 
   void showDialogFunction(int i) {
     TextEditingController visiting = TextEditingController();
@@ -25,7 +43,7 @@ class _EventScreenStateState extends State<EventScreenState> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            content: Text(" ENTER DETAIL"),
+            content: Text("ENTER DETAIL"),
             actions: [
               Column(
                 children: [
@@ -57,12 +75,15 @@ class _EventScreenStateState extends State<EventScreenState> {
                             if (Estimate.text.isEmpty) {
                               return;
                             }
-                            var item = Expense(visiting.text.toString(),
-                                double.parse(Estimate.text));
+                            var item = Expense(
+                                id: 0,
+                                expense: visiting.text.toString(),
+                                amount: double.parse(Estimate.text));
                             if (i > -1) {
                               currentindex[i] = item;
                             } else {
                               currentindex.add(item);
+                              databaseProvider.insertExpense(item);
                             }
                             setState(() {});
                             Navigator.pop(context);
